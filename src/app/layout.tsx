@@ -6,7 +6,7 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "SaaSFlow - Customer Success Dashboard",
+  title: "Customer support AI-Proficiency - Customer Success Dashboard",
   description: "Enterprise dashboard for managing merchant churn risk",
 };
 

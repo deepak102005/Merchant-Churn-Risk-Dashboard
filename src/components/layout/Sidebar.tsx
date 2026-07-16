@@ -31,9 +31,9 @@ export function Sidebar() {
       <div className="h-16 flex items-center px-6 border-b border-gray-200">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-xl">S</span>
+            <span className="text-white font-bold text-xl">C</span>
           </div>
-          <span className="font-bold text-xl tracking-tight text-slate-900">SaaSFlow</span>
+          <span className="font-bold text-xl tracking-tight text-slate-900">Customer support AI-Proficiency</span>
         </div>
       </div>
       
