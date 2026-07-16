@@ -559,3 +559,4 @@ Quality Requirements
 
 The dashboard should feel like an enterprise product used by fintech companies or SaaS customer success teams. Prioritize clarity, usability, accessibility, and premium visual polish. Every component should be production-ready with consistent spacing, typography, color usage, responsive behavior, and modern UI patterns.
 # Merchant-Churn-Risk-Dashboard
+# Merchant-Churn-Risk-Dashboard
