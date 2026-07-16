@@ -2,6 +2,7 @@
 
 import { Sidebar } from "./Sidebar"
 import { TopNav } from "./TopNav"
+import { ChatWidget } from "@/components/chat/ChatWidget"
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -15,6 +16,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           </div>
         </main>
       </div>
+      <ChatWidget />
     </div>
   )
 }
