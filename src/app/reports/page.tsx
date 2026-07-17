@@ -1,6 +1,8 @@
 "use client"
 
-import { FileText, Download, Calendar } from "lucide-react"
+import { useState } from "react"
+import { FileText, Download, Calendar, Loader2 } from "lucide-react"
+import { useToast } from "@/components/ui/Toast"
 
 const reports = [
   { name: "Q2 2026 Churn Analysis", date: "Jul 15, 2026", type: "PDF", size: "2.4 MB" },
@@ -11,6 +13,31 @@ const reports = [
 ]
 
 export default function ReportsPage() {
+  const { toast } = useToast()
+  const [isGenerating, setIsGenerating] = useState(false)
+
+  const handleGenerate = async () => {
+    setIsGenerating(true)
+    toast('Generating new report...', 'success')
+    try {
+      const res = await fetch('/api/reports/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reportType: 'Custom Report' })
+      })
+      const data = await res.json()
+      if (res.ok) {
+        toast(data.message, 'success')
+      } else {
+        toast('Failed to generate report', 'error')
+      }
+    } catch (err) {
+      toast('Network error', 'error')
+    } finally {
+      setIsGenerating(false)
+    }
+  }
+
   return (
     <>
       <div className="flex items-center justify-between mb-6">
@@ -18,8 +45,13 @@ export default function ReportsPage() {
           <h1 className="text-2xl font-bold text-gray-900">Reports</h1>
           <p className="text-sm text-gray-500">Generate and download historical churn and health reports.</p>
         </div>
-        <button className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors shadow-sm">
-          Generate New Report
+        <button 
+          onClick={handleGenerate}
+          disabled={isGenerating}
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors shadow-sm disabled:opacity-50"
+        >
+          {isGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+          {isGenerating ? 'Generating...' : 'Generate New Report'}
         </button>
       </div>
 
@@ -55,7 +87,10 @@ export default function ReportsPage() {
                     </span>
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <button className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                    <button 
+                      onClick={() => toast(`Downloading ${report.name}...`, 'success')}
+                      className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                    >
                       <Download className="w-5 h-5" />
                     </button>
                   </td>

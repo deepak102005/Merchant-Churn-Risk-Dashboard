@@ -12,6 +12,7 @@ import {
 } from '@tanstack/react-table'
 import { Merchant, mockMerchants } from '@/lib/mock-data'
 import { ChevronDown, ChevronUp, MoreHorizontal, Eye, Edit, MessageSquare, Filter, ArrowUpDown } from 'lucide-react'
+import { useToast } from "@/components/ui/Toast"
 
 const columnHelper = createColumnHelper<Merchant>()
 
@@ -22,6 +23,25 @@ interface MerchantTableProps {
 export function MerchantTable({ onRowClick }: MerchantTableProps) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [data] = useState(() => mockMerchants)
+  const { toast } = useToast()
+
+  const handleContact = async (e: React.MouseEvent, merchantId: string) => {
+    e.stopPropagation()
+    toast(`Sending message to ${merchantId}...`, 'success')
+    try {
+      const res = await fetch('/api/merchants/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ merchantId, message: "Hello" })
+      })
+      const data = await res.json()
+      if (res.ok) {
+        toast(data.message, 'success')
+      }
+    } catch (err) {
+      toast('Failed to send message', 'error')
+    }
+  }
 
   const columns = [
     columnHelper.accessor('name', {
@@ -101,13 +121,22 @@ export function MerchantTable({ onRowClick }: MerchantTableProps) {
       id: 'actions',
       cell: props => (
         <div className="flex items-center gap-2">
-          <button className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors" title="View">
+          <button 
+            onClick={(e) => { e.stopPropagation(); onRowClick(props.row.original) }}
+            className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors" title="View"
+          >
             <Eye className="w-4 h-4" />
           </button>
-          <button className="p-1.5 text-slate-400 hover:text-slate-900 hover:bg-slate-100 rounded-md transition-colors" title="Contact">
+          <button 
+            onClick={(e) => handleContact(e, props.row.original.id)}
+            className="p-1.5 text-slate-400 hover:text-slate-900 hover:bg-slate-100 rounded-md transition-colors" title="Contact"
+          >
             <MessageSquare className="w-4 h-4" />
           </button>
-          <button className="p-1.5 text-slate-400 hover:text-slate-900 hover:bg-slate-100 rounded-md transition-colors" title="More">
+          <button 
+            onClick={(e) => { e.stopPropagation(); toast('More options coming soon', 'success') }}
+            className="p-1.5 text-slate-400 hover:text-slate-900 hover:bg-slate-100 rounded-md transition-colors" title="More"
+          >
             <MoreHorizontal className="w-4 h-4" />
           </button>
         </div>
@@ -136,8 +165,11 @@ export function MerchantTable({ onRowClick }: MerchantTableProps) {
     <div className="bg-white rounded-[16px] shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)] border border-gray-100 flex flex-col overflow-hidden">
       <div className="p-5 border-b border-gray-100 flex items-center justify-between">
         <h2 className="text-lg font-bold text-gray-900">Merchants at Risk</h2>
-        <div className="flex gap-3">
-          <button className="flex items-center gap-2 px-3 py-1.5 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">
+        <div className="flex gap-2">
+          <button 
+            onClick={() => toast('Filters drawer coming soon', 'success')}
+            className="flex items-center gap-2 px-3 py-1.5 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+          >
             <Filter className="w-4 h-4" />
             Filters
           </button>

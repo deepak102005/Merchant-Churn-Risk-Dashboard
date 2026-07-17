@@ -1,8 +1,35 @@
 "use client"
 
+import { useState } from "react"
 import { Settings2, Bell, Shield, Users } from "lucide-react"
+import { useToast } from "@/components/ui/Toast"
+import { cn } from "@/lib/utils"
 
 export default function SettingsPage() {
+  const [activeTab, setActiveTab] = useState("general")
+  const [isSaving, setIsSaving] = useState(false)
+  const { toast } = useToast()
+
+  const handleSave = async () => {
+    setIsSaving(true)
+    try {
+      const res = await fetch('/api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tab: activeTab })
+      })
+      const data = await res.json()
+      if (res.ok) {
+        toast(data.message, 'success')
+      } else {
+        toast('Failed to save settings', 'error')
+      }
+    } catch (err) {
+      toast('Network error', 'error')
+    } finally {
+      setIsSaving(false)
+    }
+  }
   return (
     <>
       <div className="mb-6">
@@ -14,20 +41,32 @@ export default function SettingsPage() {
         {/* Settings Sidebar */}
         <div className="w-full md:w-64 border-r border-gray-100 p-4 bg-slate-50/50">
           <nav className="space-y-1">
-            <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium bg-blue-50 text-blue-700 transition-colors">
-              <Settings2 className="w-5 h-5" />
+            <button 
+              onClick={() => setActiveTab('general')}
+              className={cn("w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors", activeTab === 'general' ? "bg-blue-50 text-blue-700" : "text-slate-600 hover:bg-slate-100 hover:text-slate-900")}
+            >
+              <Settings2 className={cn("w-5 h-5", activeTab === 'general' ? "" : "text-slate-400")} />
               General
             </button>
-            <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors">
-              <Bell className="w-5 h-5 text-slate-400" />
+            <button 
+              onClick={() => setActiveTab('alerts')}
+              className={cn("w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors", activeTab === 'alerts' ? "bg-blue-50 text-blue-700" : "text-slate-600 hover:bg-slate-100 hover:text-slate-900")}
+            >
+              <Bell className={cn("w-5 h-5", activeTab === 'alerts' ? "" : "text-slate-400")} />
               Alert Preferences
             </button>
-            <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors">
-              <Users className="w-5 h-5 text-slate-400" />
+            <button 
+              onClick={() => setActiveTab('team')}
+              className={cn("w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors", activeTab === 'team' ? "bg-blue-50 text-blue-700" : "text-slate-600 hover:bg-slate-100 hover:text-slate-900")}
+            >
+              <Users className={cn("w-5 h-5", activeTab === 'team' ? "" : "text-slate-400")} />
               Team Members
             </button>
-            <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors">
-              <Shield className="w-5 h-5 text-slate-400" />
+            <button 
+              onClick={() => setActiveTab('security')}
+              className={cn("w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors", activeTab === 'security' ? "bg-blue-50 text-blue-700" : "text-slate-600 hover:bg-slate-100 hover:text-slate-900")}
+            >
+              <Shield className={cn("w-5 h-5", activeTab === 'security' ? "" : "text-slate-400")} />
               Security
             </button>
           </nav>
@@ -35,7 +74,7 @@ export default function SettingsPage() {
 
         {/* Settings Content */}
         <div className="flex-1 p-8">
-          <h2 className="text-lg font-bold text-gray-900 mb-6 border-b border-gray-100 pb-4">General Settings</h2>
+          <h2 className="text-lg font-bold text-gray-900 mb-6 border-b border-gray-100 pb-4 capitalize">{activeTab} Settings</h2>
           
           <div className="space-y-6 max-w-2xl">
             <div>
@@ -78,8 +117,12 @@ export default function SettingsPage() {
             </div>
 
             <div className="pt-6 border-t border-gray-100 flex justify-end">
-              <button className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors shadow-sm">
-                Save Changes
+              <button 
+                onClick={handleSave}
+                disabled={isSaving}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors shadow-sm disabled:opacity-50"
+              >
+                {isSaving ? 'Saving...' : 'Save Changes'}
               </button>
             </div>
           </div>

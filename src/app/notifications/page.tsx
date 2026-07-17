@@ -1,6 +1,8 @@
 "use client"
 
+import { useState } from "react"
 import { Bell, Clock, AlertTriangle, TrendingDown, CreditCard, ShieldAlert } from "lucide-react"
+import { useToast } from "@/components/ui/Toast"
 
 const notifications = [
   {
@@ -56,6 +58,23 @@ const notifications = [
 ]
 
 export default function NotificationsPage() {
+  const [notifs, setNotifs] = useState(notifications)
+  const { toast } = useToast()
+
+  const handleMarkAllRead = async () => {
+    try {
+      const res = await fetch('/api/notifications/mark-read', { method: 'POST' })
+      if (res.ok) {
+        setNotifs(notifs.map(n => ({ ...n, isUnread: false })))
+        toast('All notifications marked as read', 'success')
+      } else {
+        toast('Failed to update notifications', 'error')
+      }
+    } catch (err) {
+      toast('Network error', 'error')
+    }
+  }
+
   return (
     <>
       <div className="flex items-center justify-between mb-6">
@@ -63,14 +82,17 @@ export default function NotificationsPage() {
           <h1 className="text-2xl font-bold text-gray-900">Notifications</h1>
           <p className="text-sm text-gray-500">Recent alerts and system messages.</p>
         </div>
-        <button className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors">
+        <button 
+          onClick={handleMarkAllRead}
+          className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
+        >
           Mark all as read
         </button>
       </div>
 
       <div className="bg-white rounded-[16px] shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)] border border-gray-100 overflow-hidden">
         <div className="divide-y divide-gray-100">
-          {notifications.map((note) => (
+          {notifs.map((note) => (
             <div 
               key={note.id} 
               className={`p-5 flex items-start gap-4 hover:bg-slate-50 transition-colors cursor-pointer ${note.isUnread ? 'bg-blue-50/30' : ''}`}
